@@ -1,10 +1,14 @@
 import * as util from "../../util.js";
 import jsesc from "jsesc";
 
+const padStartMultiline = (str, num, paddingSymbol = ' ') => {
+  return str.split("\n").map(s => s.padStart(num, paddingSymbol)).join("\n")
+}
+
 export const _toJsFetch = request => {
   let jsFetchCode = ''
 
-  if (request.data) {
+  /*if (request.data) {
     // escape single quotes if there are any in there
     if (request.data.indexOf("'") > -1) {
       request.data = jsesc(request.data)
@@ -25,55 +29,74 @@ export const _toJsFetch = request => {
     } catch {
       request.data = '\'' + request.data + '\''
     }
-  }
+  }*/
 
-  jsFetchCode += 'fetch(\'' + request.url + '\''
+  jsFetchCode += 'let req = fetch(\'https://scrapeninja.p.rapidapi.com/scrape\'';
 
-  if (request.method !== 'get' || request.headers || request.cookies || request.auth || request.body) {
-    jsFetchCode += ', {\n'
+  jsFetchCode += ', {\n'
 
-    if (request.method !== 'get') {
-      jsFetchCode += '    method: \'' + request.method.toUpperCase() + '\''
-    }
+  jsFetchCode += '    method: \'POST\',\n';
 
-    if (request.headers || request.cookies || request.auth) {
-      if (request.method !== 'get') {
-        jsFetchCode += ',\n'
-      }
-      jsFetchCode += '    headers: {\n'
-      const headerCount = Object.keys(request.headers || {}).length
-      let i = 0
+  jsFetchCode += '    headers: \n';
+
+  let outerHeaders = {
+    'Content-Type': 'application/json', 
+    'x-rapidapi-host': 'scrapeninja.p.rapidapi.com', 
+    'x-rapidapi-key': '2c8a9cdbc1msh6d929ba24e58938p149915jsn9c89cc3cd416'
+  };
+
+  jsFetchCode += padStartMultiline(JSON.stringify(outerHeaders, null, 4), 5, ' ');
+
+  jsFetchCode += ',\n';
+
+  let data = {
+    url: request.url,
+
+  };
+
+
+  if (request.headers || request.cookies || request.auth) {
+      data.headers = [];
+
       for (const headerName in request.headers) {
-        jsFetchCode += '        \'' + headerName + '\': \'' + request.headers[headerName] + '\''
-        if (i < headerCount - 1 || request.cookies || request.auth) {
-          jsFetchCode += ',\n'
-        }
-        i++
+        data.headers.push(headerName + ': ' + request.headers[headerName]);
+
       }
+
+      if (request.method != 'get') {
+        data.method = "POST";
+      }
+
       if (request.auth) {
         const splitAuth = request.auth.split(':')
         const user = splitAuth[0] || ''
         const password = splitAuth[1] || ''
-        jsFetchCode += '        \'Authorization\': \'Basic \' + btoa(\'' + user + ':' + password + '\')'
+        data.headers.push( '        \'Authorization\': \'Basic \' + btoa(\'' + user + ':' + password + '\')');
       }
       if (request.cookies) {
         const cookieString = util.serializeCookies(request.cookies)
-        jsFetchCode += '        \'Cookie\': \'' + cookieString + '\''
+        data.headers.push( '        \'Cookie\': \'' + cookieString + '\'' );
       }
-
-      jsFetchCode += '\n    }'
-    }
-
-    if (request.data) {
-      jsFetchCode += ',\n    body: ' + request.data
-    }
-
-    jsFetchCode += '\n}'
   }
+
+  if (request.data) {
+    data.data = request.data;
+  }
+
+  jsFetchCode += '    body: JSON.stringify(' + padStartMultiline(JSON.stringify(data, null, 4), 8) + ')\n';
+
+  jsFetchCode += '\n    }'
+
 
   jsFetchCode += ');'
 
-  return jsFetchCode + '\n'
+  jsFetchCode += '\n'
+
+  jsFetchCode += 'req.then((res) => res.json()).then(json => console.log(json))'
+
+  jsFetchCode += '\n'
+
+  return jsFetchCode;
 }
 
 export const toJsFetch = curlCommand => {

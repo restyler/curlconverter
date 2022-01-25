@@ -8,28 +8,6 @@ const padStartMultiline = (str, num, paddingSymbol = ' ') => {
 export const _toJsFetch = request => {
   let jsFetchCode = ''
 
-  /*if (request.data) {
-    // escape single quotes if there are any in there
-    if (request.data.indexOf("'") > -1) {
-      request.data = jsesc(request.data)
-    }
-
-    try {
-      JSON.parse(request.data)
-
-      if (!request.headers) {
-        request.headers = {}
-      }
-
-      if (!request.headers['Content-Type']) {
-        request.headers['Content-Type'] = 'application/json; charset=UTF-8'
-      }
-
-      request.data = 'JSON.stringify(' + request.data + ')'
-    } catch {
-      request.data = '\'' + request.data + '\''
-    }
-  }*/
 
   jsFetchCode += 'let req = fetch(\'https://scrapeninja.p.rapidapi.com/scrape\'';
 
@@ -42,7 +20,7 @@ export const _toJsFetch = request => {
   let outerHeaders = {
     'Content-Type': 'application/json', 
     'x-rapidapi-host': 'scrapeninja.p.rapidapi.com', 
-    'x-rapidapi-key': '2c8a9cdbc1msh6d929ba24e58938p149915jsn9c89cc3cd416'
+    'x-rapidapi-key': 'YOUR-RAPIDAPI-KEY'
   };
 
   jsFetchCode += padStartMultiline(JSON.stringify(outerHeaders, null, 4), 5, ' ');
@@ -54,6 +32,9 @@ export const _toJsFetch = request => {
 
   };
 
+  if (request.method != 'get') {
+    data.method = "POST";
+  }
 
   if (request.headers || request.cookies || request.auth) {
       data.headers = [];
@@ -62,10 +43,8 @@ export const _toJsFetch = request => {
         data.headers.push(headerName + ': ' + request.headers[headerName]);
 
       }
-
-      if (request.method != 'get') {
-        data.method = "POST";
-      }
+      
+      
 
       if (request.auth) {
         const splitAuth = request.auth.split(':')

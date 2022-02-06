@@ -54,7 +54,7 @@ export const _toJsFetch = request => {
       }
       if (request.cookies) {
         const cookieString = util.serializeCookies(request.cookies)
-        data.headers.push( '        \'Cookie\': \'' + cookieString + '\'' );
+        data.headers.push( 'Cookie: ' + cookieString );
       }
   }
 

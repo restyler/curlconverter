@@ -7,8 +7,9 @@ const padStartMultiline = (str, num, paddingSymbol = ' ') => {
 export const _toPython = request => {
   let jsFetchCode = 'import requests\nimport json\n\n'
 
-  jsFetchCode += 'url = \'https://scrapeninja.p.rapidapi.com/scrape\'\n';
+  jsFetchCode += 'url = \'https://scrapeninja.p.rapidapi.com/scrape\'\n\n';
 
+  jsFetchCode += '# get your subscription key at https://rapidapi.com/restyler/api/scrapeninja from "Code generator",\n# copy&paste it to \'x-rapidapi-key\' header below\n\n';
   let outerHeaders = {
     'Content-Type': 'application/json', 
     'x-rapidapi-host': 'scrapeninja.p.rapidapi.com', 
@@ -60,12 +61,12 @@ export const _toPython = request => {
     data.data = request.data;
   }
 
-  jsFetchCode += 'json.dumps(' + padStartMultiline(JSON.stringify(data, null, 4), 8) + ')\n';
+  jsFetchCode += padStartMultiline(JSON.stringify(data, null, 4), 8) + '\n';
 
 
   jsFetchCode += '\n'
 
-  jsFetchCode += 'response = requests.request("POST", url, data=payload, headers=headers)\n'
+  jsFetchCode += 'response = requests.request("POST", url, json=payload, headers=headers)\n'
 
   jsFetchCode += '\n'
 

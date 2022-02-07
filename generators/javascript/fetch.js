@@ -8,6 +8,7 @@ const padStartMultiline = (str, num, paddingSymbol = ' ') => {
 export const _toJsFetch = request => {
   let jsFetchCode = ''
 
+  jsFetchCode += '// get your subscription key at https://rapidapi.com/restyler/api/scrapeninja from "Code generator",\n// copy&paste it to \'x-rapidapi-key\' header below \n\n';
 
   jsFetchCode += 'let req = fetch(\'https://scrapeninja.p.rapidapi.com/scrape\'';
 
@@ -50,7 +51,7 @@ export const _toJsFetch = request => {
         const splitAuth = request.auth.split(':')
         const user = splitAuth[0] || ''
         const password = splitAuth[1] || ''
-        data.headers.push( '        \'Authorization\': \'Basic \' + btoa(\'' + user + ':' + password + '\')');
+        data.headers.push( 'Authorization: Basic ' + Buffer.from(user + ':' + password).toString('base64'));
       }
       if (request.cookies) {
         const cookieString = util.serializeCookies(request.cookies)

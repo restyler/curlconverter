@@ -13,7 +13,7 @@ export const _toPython = request => {
   let outerHeaders = {
     'Content-Type': 'application/json', 
     'x-rapidapi-host': 'scrapeninja.p.rapidapi.com', 
-    'x-rapidapi-key': 'YOUR-RAPIDAPI-KEY'
+    'x-rapidapi-key': process.env.RAPIDAPI_KEY ?? 'YOUR-RAPIDAPI-KEY'
   };
 
   jsFetchCode += 'headers = ';
